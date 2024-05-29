@@ -10,7 +10,7 @@ def main():
     workflow = Workflow(env)
 
     # Define the path to the folder containing the model files
-    models_folder = "C:\\Python_Excercises\\PythonCTM\\example"
+    models_folder = "C:\\Projects\\PythonCTM\\example"
 
     # Build dependency graph from model files
     dependency_graph = show_dependencies(models_folder)
