@@ -1,7 +1,7 @@
 from ctm_python_client.core.workflow import Workflow
 from ctm_python_client.core.comm import Environment
-from dependency_analysis import show_dependencies
-from dbt_jobs import create_jobs_from_dependency_graph
+from dependency_analysis_ import show_dependencies
+from dbt_job_ import create_jobs_from_dependency_graph
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
     workflow = Workflow(env)
 
     # Define the path to the folder containing the model files
-    models_folder = "C:\\Projects\\PythonCTM\\example"
+    models_folder = "C:\\Users\\dbauser\\dbt-env\\dbtcore\\models"
 
     # Build dependency graph from model files
     dependency_graph = show_dependencies(models_folder)

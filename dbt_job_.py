@@ -13,7 +13,7 @@ class AIDBTcore(AIJob):
 
 
 def create_dbt_job(workflow, job_name, connection_profile, dbt_project_path, virtual_env_activation, dbt_command,
-                   event_name=None, wait_event_name=None):
+                   event_name=None, wait_event_name=None, when=None):
     dbtjob = AIDBTcore(job_name, connection_profile=connection_profile,
                        dbtProjectPath=dbt_project_path,
                        VirtualEnvActivation=virtual_env_activation,
@@ -26,6 +26,9 @@ def create_dbt_job(workflow, job_name, connection_profile, dbt_project_path, vir
     if event_name:
         addEventListObject = AddEvents([EventOutAdd(event=event_name)])
         dbtjob.event_list.append(addEventListObject)
+
+    if when:
+        dbtjob.when = when
 
     workflow.add(dbtjob, inpath='ctmFolder')
     return dbtjob
@@ -41,6 +44,13 @@ def create_jobs_from_dependency_graph(workflow, dependency_graph):
         dependencies = dependency_graph[model]
         print(f'dep: {dependencies}')
 
+        when_schedule = Job.When(
+            week_days=['NONE'],
+            month_days=['NONE'],
+            week_days_calendar='MatiCal'
+
+        )
+
         if dependencies:
             # Create jobs for dependencies first
             for dependency in dependencies:
@@ -54,8 +64,10 @@ def create_jobs_from_dependency_graph(workflow, dependency_graph):
                 dbt_project_path="C:\\Users\\dbauser\\dbt-env\\dbtcore",
                 virtual_env_activation="C:\\Users\\dbauser\\dbt-env\\Scripts\\activate",
                 dbt_command=f"dbt run --select {model}",
+
                 wait_event_name=wait_event_name,
-                event_name=f"{model}_done" if any(model in deps for deps in dependency_graph.values()) else None
+                event_name=f"{model}_done" if any(model in deps for deps in dependency_graph.values()) else None,
+                when=when_schedule
             )
         elif not dependencies:
             dbtjob = create_dbt_job(
@@ -65,7 +77,8 @@ def create_jobs_from_dependency_graph(workflow, dependency_graph):
                 dbt_project_path="C:\\Users\\dbauser\\dbt-env\\dbtcore",
                 virtual_env_activation="C:\\Users\\dbauser\\dbt-env\\Scripts\\activate",
                 dbt_command=f"dbt run --select {model}",
-                event_name=f"{model}_done"
+                event_name=f"{model}_done",
+                when=when_schedule
             )
 
         job_objects[model] = dbtjob
