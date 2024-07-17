@@ -1,42 +1,36 @@
 import os
 import re
-
-
-def find_model_files(folder_path):
-    model_files = []
-    for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            if file.endswith(".sql"):
-                model_files.append(os.path.join(root, file))
-    return model_files
-
-
-def extract_dependencies(model_file):
-    dependencies = set()
-    with open(model_file, 'r') as f:
-        content = f.read()
-        ref_pattern = re.compile(r'{{\s*ref\(\'([^\']+)\'.*?}}')
-        matches = ref_pattern.findall(content)
-        dependencies.update(matches)
-    return dependencies
-
-
-def build_dependency_graph(model_files):
-    dependency_graph = {}
-    for model_file in model_files:
-        model_name = os.path.splitext(os.path.basename(model_file))[0]  # Remove .sql extension
-        dependencies = extract_dependencies(model_file)
-        dependency_graph[model_name] = dependencies
-    return dependency_graph
-
+from collections import defaultdict
 
 def show_dependencies(models_folder):
-    model_files = find_model_files(models_folder)
-    dependency_graph = build_dependency_graph(model_files)
+    # Dictionary to store dependencies
+    dependency_graph = defaultdict(list)
 
-    for model, dependencies in dependency_graph.items():
-        print(f"Model: {model}")
-        print(f"Dependencies: {dependencies}")
-        print()
+    # Regular expression to find ref calls
+    ref_pattern = re.compile(r"\{\{\s*ref\(['\"](.*?)['\"]\)\s*\}\}")
 
-    return dependency_graph
+    # Iterate through model files
+    for root, _, files in os.walk(models_folder):
+        for file in files:
+            if file.endswith(".sql"):
+                model_name = file.replace(".sql", "")
+                file_path = os.path.join(root, file)
+                print(f"Analyzing file: {file_path}")  # Debugging statement
+                with open(file_path, 'r') as f:
+                    content = f.read()
+
+                # Find all ref calls in the file
+                matches = ref_pattern.findall(content)
+                if matches:
+                    for match in matches:
+                        dependency_graph[model_name].append(match)
+                        if match not in dependency_graph:
+                            dependency_graph[match] = []  # Ensure all models are keys
+
+                    print(f"Found dependency: {model_name} -> {match}")  # Debugging statement
+                else:
+                    # Ensure every model is initialized in the dependency graph
+                    if model_name not in dependency_graph:
+                        dependency_graph[model_name] = []
+
+    return dict(dependency_graph)
