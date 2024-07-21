@@ -6,14 +6,6 @@ def show_dependencies(models_folder):
     dependency_graph = defaultdict(list)
     ref_pattern = re.compile(r"\{\{\s*ref\(['\"](.*?)['\"]\)\s*\}\}")
 
-    model_files = set()
-
-    for root, _, files in os.walk(models_folder):
-        for file in files:
-            if file.endswith(".sql"):
-                model_name = file.replace(".sql", "")
-                model_files.add(model_name)
-
     for root, _, files in os.walk(models_folder):
         for file in files:
             if file.endswith(".sql"):
@@ -26,10 +18,13 @@ def show_dependencies(models_folder):
                 matches = ref_pattern.findall(content)
                 if matches:
                     for match in matches:
-                        if match in model_files:
+                        if match in dependency_graph or match != model_name:
                             dependency_graph[model_name].append(match)
                             print(f"Found dependency: {model_name} -> {match}")
                         else:
                             print(f"Warning: {model_name} has a reference to non-existent model {match}")
+
+                if model_name not in dependency_graph:
+                    dependency_graph[model_name] = []
 
     return dict(dependency_graph)
