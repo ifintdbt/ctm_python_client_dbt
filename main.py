@@ -6,7 +6,9 @@ from dependency_analysis import show_dependencies
 from dbt_job import create_jobs_from_dependency_graph
 
 def load_config(filename):
-    with open(filename, 'r') as f:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(script_dir, filename)
+    with open(config_path, 'r') as f:
         return json.load(f)
 
 def main():
