@@ -2,6 +2,9 @@ import os
 import re
 from collections import defaultdict
 
+# This section will find the dependencies that exist in the model files - By looking into the ref functions which should return the relation.
+# It is the Core of the workflow's structure.
+
 
 def show_dependencies(models_folder):
     dependency_graph = defaultdict(list)

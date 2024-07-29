@@ -1,6 +1,8 @@
 import attrs
 from aapi import *
 
+# In this section,
+# the Control-M jobs will be created together with the relevant attributes according to the job dependencies and the Control-M environment configurations.
 
 @attrs.define
 class AIDBTcore(AIJob):
