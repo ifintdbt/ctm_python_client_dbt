@@ -1,5 +1,5 @@
 {
-  "models_folder": "C:\\Users\\dbauser\\dbt-env\\dbtcore\\models",
-  "dbt_project_path": "C:\\Users\\dbauser\\dbt-env\\dbtcore",
-  "virtual_env_activation": "C:\\Users\\dbauser\\dbt-env\\Scripts\\activate"
+  "models_folder": "C:\\Path\\To\\models\\Folder",
+  "dbt_project_path": "C:\\Path\\To\\dbtcore\\Project\\Folder",
+  "virtual_env_activation": "C:\\Path\\To\\dbt-env\\Scripts\\activate"
 }
