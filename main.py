@@ -5,7 +5,7 @@ from ctm_python_client.core.comm import Environment
 from dependency_analysis import show_dependencies
 from dbt_job import create_jobs_from_dependency_graph
 
-
+#This section defines the function for reading the data out of the JSON configurations files files
 def load_config(filename):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(script_dir, filename)
@@ -13,7 +13,7 @@ def load_config(filename):
         return json.load(f)
 
 def main():
-    # Load configurations
+    # There are two files that exist in the CoLoad configurations
     dbt_config = load_config('Config/dbt_config.json')
     ctm_config = load_config('Config/ctm_environment.json')
 
