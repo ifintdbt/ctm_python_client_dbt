@@ -45,7 +45,7 @@ def main():
     except Exception as e:
         print(f"Failed to serialize workflow: {str(e)}")
 
-    # Build and deploys the workflow. Ordering/Running the workflow env can also be added to this section.
+    # Builds and deploys the workflow. Ordering/Running the workflow env can also be added to this section.
     build_response = workflow.build()
     if build_response.is_ok():
         print('The workflow is valid!')
