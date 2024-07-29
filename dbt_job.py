@@ -1,7 +1,6 @@
 import attrs
-from ctm_python_client.core.workflow import Workflow
-from ctm_python_client.core.comm import Environment
 from aapi import *
+
 
 @attrs.define
 class AIDBTcore(AIJob):
@@ -10,8 +9,9 @@ class AIDBTcore(AIJob):
     VirtualEnvActivation = AIJob.field('Virtual Environment Activation Path')
     dbtcommand = AIJob.field('dbt Command')
 
+
 def create_dbt_job(workflow, job_name, connection_profile, dbt_project_path, virtual_env_activation, dbt_command,
-                   event_name=None, wait_event_name=None, when=None):
+                   event_name=None, wait_event_name=None, when=None, inpath=None):
     dbtjob = AIDBTcore(job_name, connection_profile=connection_profile,
                        dbtProjectPath=dbt_project_path,
                        VirtualEnvActivation=virtual_env_activation,
@@ -28,13 +28,17 @@ def create_dbt_job(workflow, job_name, connection_profile, dbt_project_path, vir
     if when:
         dbtjob.when = when
 
-    workflow.add(dbtjob, inpath='ctmFolder')
+    workflow.add(dbtjob, inpath=inpath)
     return dbtjob
 
-def create_jobs_from_dependency_graph(workflow, dependency_graph, config):
+
+def create_jobs_from_dependency_graph(workflow, dependency_graph, dbt_config, ctm_config):
     job_objects = {}
-    dbt_project_path = config.get("dbt_project_path")
-    virtual_env_activation = config.get("virtual_env_activation")
+    dbt_project_path = dbt_config.get("dbt_project_path")
+    virtual_env_activation = dbt_config.get("virtual_env_activation")
+    connection_profile = ctm_config["connection_profile"]
+    week_days_calendar = ctm_config["week_days_calendar"]
+    inpath = ctm_config["inpath"]
 
     def create_job_recursive(model):
         if model in job_objects:
@@ -44,7 +48,7 @@ def create_jobs_from_dependency_graph(workflow, dependency_graph, config):
         when_schedule = Job.When(
             week_days=['NONE'],
             month_days=['NONE'],
-            week_days_calendar='MatiCal'
+            week_days_calendar=week_days_calendar
         )
 
         if dependencies:
@@ -57,13 +61,14 @@ def create_jobs_from_dependency_graph(workflow, dependency_graph, config):
             dbtjob = create_dbt_job(
                 workflow,
                 job_name=model,
-                connection_profile='DBT',
+                connection_profile=connection_profile,
                 dbt_project_path=dbt_project_path,
                 virtual_env_activation=virtual_env_activation,
                 dbt_command=f"dbt run --select {model}",
                 wait_event_name=None,  # No immediate event to wait for
                 event_name=f"{model}_done",  # Event triggered after completion
-                when=when_schedule
+                when=when_schedule,
+                inpath=inpath
             )
 
             # Add wait events for each dependency
@@ -76,12 +81,13 @@ def create_jobs_from_dependency_graph(workflow, dependency_graph, config):
             dbtjob = create_dbt_job(
                 workflow,
                 job_name=model,
-                connection_profile='DBT',
+                connection_profile=connection_profile,
                 dbt_project_path=dbt_project_path,
                 virtual_env_activation=virtual_env_activation,
                 dbt_command=f"dbt run --select {model}",
                 event_name=f"{model}_done",
-                when=when_schedule
+                when=when_schedule,
+                inpath=inpath
             )
 
         job_objects[model] = dbtjob

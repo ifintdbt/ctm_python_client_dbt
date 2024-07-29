@@ -5,6 +5,7 @@ from ctm_python_client.core.comm import Environment
 from dependency_analysis import show_dependencies
 from dbt_job import create_jobs_from_dependency_graph
 
+
 def load_config(filename):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(script_dir, filename)
@@ -35,7 +36,7 @@ def main():
     print("Dependency Graph:", dependency_graph)
 
     # Create jobs based on the dependency graph
-    create_jobs_from_dependency_graph(workflow, dependency_graph, dbt_config)
+    create_jobs_from_dependency_graph(workflow, dependency_graph, dbt_config, ctm_config)
 
     # Print the workflow JSON
     try:
@@ -56,6 +57,7 @@ def main():
         print('The workflow is deployed!')
     else:
         print("Deployment Errors:", deploy_response.errors)
+
 
 if __name__ == "__main__":
     main()

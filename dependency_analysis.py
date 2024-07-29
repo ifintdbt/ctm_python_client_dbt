@@ -2,6 +2,7 @@ import os
 import re
 from collections import defaultdict
 
+
 def show_dependencies(models_folder):
     dependency_graph = defaultdict(list)
     ref_pattern = re.compile(r"\{\{\s*ref\(['\"](.*?)['\"]\)\s*\}\}")

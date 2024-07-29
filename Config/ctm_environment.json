@@ -1,5 +1,8 @@
 {
   "url": "dba-tlv-wlad4r.bmc.com",
   "username": "emuser",
-  "password": "empass"
+  "password": "empass",
+  "connection_profile": "DBT",
+  "week_days_calendar": "MatiCal",
+  "inpath": "ctmFolder"
 }
